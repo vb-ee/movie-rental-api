@@ -1,24 +1,12 @@
 const express = require('express')
 const Joi = require('joi')
+const genres = require('./genres')
 
 const app = express()
 app.use(express.json())
 
-const genres = [
-    { id: 1, genre: 'romance' },
-    { id: 2, genre: 'action' },
-    { id: 3, genre: 'thriller' },
-    { id: 4, genre: 'western' },
-    { id: 5, genre: 'fiction' },
-    { id: 6, genre: 'war' },
-    { id: 7, genre: 'drama' },
-    { id: 8, genre: 'horror' },
-    { id: 9, genre: 'slasher' },
-    { id: 10, genre: 'comedy' }    
-]
-
 app.get('/', (req, res) => {
-    res.send('Hi, this is vidly')
+    res.send('Simple Route Handler API')
 })
 
 app.get('/api/genres', (req, res) => {
