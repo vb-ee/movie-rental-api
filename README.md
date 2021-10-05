@@ -1,10 +1,17 @@
-# express-route-handler
-This is a simple route handler with express made for learning purposes as an exercise 
+# simple-api-project
 
-Can be tested with postman or any other api testing software Don't forget to install all dependencies
+This is a simple api project with express and MongoDB
+
+In order to run it you should have MongoDB installed on your machine
+and run the `mongod` command on the cmd so you can connect to the database
+
+Can be tested with postman or any other api testing software and
+reliable for further improvements like real-life projects
+
+Don't forget to install all dependencies
 
 `npm install`
 
-and run the code with the command
+and run it on the terminal with the command
 
 `node app.js`

@@ -1,21 +1,16 @@
+const Genre = require('../models/genre')
+const validateGenre = require('../models/validation')
 const express = require('express')
-const Genre = require('./mongo')
+const router = express.Router()
 
-const app = express()
-app.use(express.json())    
-    
-    
-app.get('/', (req, res) => {
-    res.send('Simple Route Handler API Project with MongoDB')
-})
-    
 
-app.get('/api/genres', async (req, res) => {
+
+router.get('/', async (req, res) => {
     res.send(await Genre.find().sort('name'))   
 })
 
 
-app.post('/api/genres', async (req, res) => {
+router.post('/', async (req, res) => {
     const genre = new Genre({
         name: req.body.name
     })   
@@ -28,21 +23,25 @@ app.post('/api/genres', async (req, res) => {
 })
 
 
-app.put('/api/genres/:id', async (req, res) => {
+router.put('/:id', async (req, res) => {
     try {
-        const genre = await Genre.findById(req.params.id)
-        if (!genre) return res.status(404).send('No such a genre!') 
+        const { error } = validateGenre(req.body, true)
+        if(error) return res.status(400).send(error.details[0].message)
 
-        genre.name = req.body.name
-        
-        res.send(await genre.save())         
+        const genre = await Genre.findByIdAndUpdate(req.params.id, {
+            $set: {
+                name: req.body.name
+            }
+        }, { new: true})
+
+        res.send(genre)         
     } catch (error) {        
-        res.status(400).send(error.message) 
+        res.status(404).send(error.message) 
     }
 })    
 
 
-app.delete('/api/genres/:id', async (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
         res.send(await Genre.findByIdAndDelete(req.params.id))
     } catch (error) {
@@ -50,7 +49,7 @@ app.delete('/api/genres/:id', async (req, res) => {
     }
 })    
 
-app.get('/api/genres/:id', async (req, res) => {
+router.get('/:id', async (req, res) => {
     try {        
         res.send(await Genre.findById(req.params.id))            
     } catch (error) {
@@ -58,6 +57,4 @@ app.get('/api/genres/:id', async (req, res) => {
     }
 })    
 
-const port = process.env.PORT || 3000
-
-app.listen(port)
+module.exports = router

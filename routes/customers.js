@@ -1,20 +1,18 @@
+const Customer = require('../models/customer')
+const validateCustomer = require('../models/validation')
 const express = require('express')
-const Customer = require('./mongo')
+const router = express() 
 
-const app = express()
-app.use(express.json())    
-    
 
-app.get('/api/customers', async (req, res) => {
+router.get('/', async (req, res) => {
     res.send(await Customer.find().sort('name'))   
 })
 
-
-app.post('/api/cutomers', async (req, res) => {
+router.post('/', async (req, res) => {
     const customer = new Customer({
         isPremium: req.body.isPremium,
         name: req.body.name,
-        name: req.body.phone
+        phone: req.body.phone
     })   
 
     try {
@@ -25,23 +23,27 @@ app.post('/api/cutomers', async (req, res) => {
 })
 
 
-app.put('/api/cutomers/:id', async (req, res) => {
+router.put('/:id', async (req, res) => {
     try {
-        const customer = await Customer.findById(req.params.id)
-        if (!customer) return res.status(404).send('No such a customer!') 
+        const { error } = validateCustomer(req.body)
+        if(error) return res.status(400).send(error.details[0].message)
 
-        customer.isPremium = req.body.isPremium
-        customer.name = req.body.name
-        customer.phone = req.body.phone
+        const customer = await Customer.findByIdAndUpdate(req.params.id, {
+            $set: {
+                isPremium: req.body.isPremium,
+                name: req.body.name,
+                phone: req.body.phone
+            }
+        }, { new: true })
 
-        res.send(await customer.save())         
+        res.send(customer)         
     } catch (error) {        
-        res.status(400).send(error.message) 
+        res.status(404).send(error.message) 
     }
 })    
 
 
-app.delete('/api/customers/:id', async (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
         res.send(await Customer.findByIdAndDelete(req.params.id))
     } catch (error) {
@@ -49,7 +51,7 @@ app.delete('/api/customers/:id', async (req, res) => {
     }
 })    
 
-app.get('/api/customers/:id', async (req, res) => {
+router.get('/:id', async (req, res) => {
     try {        
         res.send(await Customer.findById(req.params.id))            
     } catch (error) {
@@ -57,6 +59,4 @@ app.get('/api/customers/:id', async (req, res) => {
     }
 })    
 
-const port = process.env.PORT || 3000
-
-app.listen(port)
+module.exports = router
