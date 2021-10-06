@@ -1,18 +1,21 @@
 const Joi = require('joi')
 
-const validateDocument = (document, genre = false) => {
-    const customerSchema = Joi.object({
-        name: Joi.string().min(2).max(50).required(),
-        phone: Joi.string().min(5).max(50).required(),
-        isPremium: Joi.boolean().default(false)
-    })
+const validateDocument = (document, schemaToValidate) => {
+    switch(schemaToValidate){
+        case 'genre': 
+            return Joi.object({
+                name: Joi.string().min(3).max(50).required() 
+            })
+        break
 
-    const genreSchema = Joi.object({
-        name: Joi.string().min(3).max(50).required(),
-    })
-
-    if (genre) return genreSchema.validate(document)
-    else return customerSchema.validate(document)
+        case 'customer': 
+            return Joi.object({
+                name: Joi.string().min(2).max(50).required(),
+                phone: Joi.string().min(5).max(50).required(),
+                isPremium: Joi.boolean().default(false)
+            })
+        break
+    }
 }
 
 module.exports = validateDocument
