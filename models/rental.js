@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const Rental = mongoose.model('Movies', new mongoose.Schema({
+const Rental = mongoose.model('Rentals', new mongoose.Schema({
     customer: {
         type: new mongoose.Schema({
             name: {
