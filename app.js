@@ -13,6 +13,7 @@ app.use(express.json())
 app.use('/api/genres', genres)
 app.use('/api/customers', customers)
 app.use('/api/movies', movies)
+app.use('/api/rentals', rentals)
 app.use((req, res) => res.status(404).send('Not Found'))
 
 const port = process.env.PORT || 3000

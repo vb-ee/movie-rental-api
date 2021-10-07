@@ -4,14 +4,14 @@ const validateMovie = require('../models/validation')
 const express = require('express')
 const router = express.Router()
 
-
 router.get('/', async (req, res) => {
-    res.send(await Movie.find().sort('name'))   
+    res.send(await Movie.find().sort('title'))   
 })
 
 router.post('/', async (req, res) => {
     try {
         validateMovie(req.body, 'movie')
+
         const genre = await Genre.findById(req.body.genreId)
         if (!genre) return res.status(400).send('Invalid genre!')
 
@@ -24,12 +24,11 @@ router.post('/', async (req, res) => {
             numberInStock: req.body.numberInStock,
             dailyRentRate: req.body.dailyRentRate
         })   
-        res.send(await movie.save())       
+        res.send(await movie.save())
     } catch (error) {
         res.status(400).send(error.details[0].message)
     }
 })
-
 
 router.put('/:id', async (req, res) => {
     try {
@@ -56,7 +55,6 @@ router.put('/:id', async (req, res) => {
         res.status(404).send(error.message) 
     }
 })    
-
 
 router.delete('/:id', async (req, res) => {
     try {

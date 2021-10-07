@@ -24,6 +24,12 @@ const validateDocument = (document, docType) => {
                 dailyRentRate: Joi.number().min(0).required()
             })
         break
+
+        case 'rental':
+            validation = Joi.object({
+                customerId: Joi.string().required(),
+                movieId: Joi.string().required()
+            })
     }
 
     return validation.validate(document)
