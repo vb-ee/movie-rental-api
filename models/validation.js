@@ -31,6 +31,8 @@ const validateDocument = (document, docType) => {
                 customerId: Joi.objectId().required(),
                 movieId: Joi.objectId().required()
             })
+        break
+
     }
 
     return validation.validate(document)
