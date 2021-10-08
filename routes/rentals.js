@@ -16,15 +16,15 @@ router.post('/', async (req, res) => {
     try {
         validateRental(req.body, 'rental')
 
-        let customer = await Customer.findById(req.body.customerId)
+        const customer = await Customer.findById(req.body.customerId)
         if (!customer) return res.status(400).send('Customer Not Found!')
 
-        let movie = await Movie.findById(req.body.movieId)
+        const movie = await Movie.findById(req.body.movieId)
         if (!movie) return res.status(400).send('Movie Not Found!')
 
         if (movie.numberInStock === 0) return res.status(400).send('Movie Not Found!')
 
-        let rental = new Rental({
+        const rental = new Rental({
             customer: {
                 _id: customer._id,
                 name: customer.name,
@@ -54,44 +54,6 @@ router.post('/', async (req, res) => {
         res.status(400).send(error.details[0].message)
     }
 })
-
-// router.put('/:id', async (req, res) => {
-//     try {
-//         const { error } = validateRental(req.body, 'movie')
-//         if(error) return res.status(400).send(error.details[0].message)
-
-//         let customer = await Customer.findById(req.body.customerId)
-//         if (!customer) return res.status(400).send('Customer Not Found!')
-
-//         let movie = await Movie.findById(req.body.movieId)
-//         if (!movie) return res.status(400).send('Movie Not Found!')
-
-//         let rental = await Rental.findByIdAndUpdate(req.params.id, {
-//             $set: {
-//                 customer: {
-//                     _id: customer._id,
-//                     name: customer.name,
-//                     isPremium: customer.isPremium,
-//                     phone: customer.phone
-//                 },
-
-//                 movie: {
-//                     _id: movie._id,
-//                     title: movie.name,
-//                     phone: movie.phone,
-//                     dailyRentRate: movie.dailyRentRate
-//                 },
-//                 dateOut: req.body.dateOut,
-//                 dateReturned: req.body.dateReturned,
-//                 rentalFee: req.body.rentalFee
-//             }
-//         }, { new: true})
-
-//         res.send(rental)         
-//     } catch (error) {        
-//         res.status(404).send(error.message) 
-//     }
-// })    
 
 router.delete('/:id', async (req, res) => {
     try {

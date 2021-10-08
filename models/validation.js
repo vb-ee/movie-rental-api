@@ -1,4 +1,5 @@
 const Joi = require('joi')
+Joi.objectId = require('joi-objectid')(Joi)
 
 const validateDocument = (document, docType) => {
     switch(docType){
@@ -19,7 +20,7 @@ const validateDocument = (document, docType) => {
         case 'movie':
             validation = Joi.object({
                 title: Joi.string().min(2).max(50).required(),
-                genreId: Joi.string().required(),
+                genreId: Joi.objectId().required(),
                 numberInStock: Joi.number().min(0).required(),
                 dailyRentRate: Joi.number().min(0).required()
             })
@@ -27,8 +28,8 @@ const validateDocument = (document, docType) => {
 
         case 'rental':
             validation = Joi.object({
-                customerId: Joi.string().required(),
-                movieId: Joi.string().required()
+                customerId: Joi.objectId().required(),
+                movieId: Joi.objectId().required()
             })
     }
 
