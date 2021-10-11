@@ -1,62 +1,64 @@
+const auth = require('../middleware/auth')
 const Customer = require('../models/customer')
 const validateCustomer = require('../models/validation')
 const express = require('express')
-const router = express() 
-
+const router = express()
 
 router.get('/', async (req, res) => {
-    res.send(await Customer.find().sort('name'))   
+    res.send(await Customer.find().sort('name'))
 })
 
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
     const customer = new Customer({
         isPremium: req.body.isPremium,
         name: req.body.name,
-        phone: req.body.phone
-    })   
+        phone: req.body.phone,
+    })
 
     try {
-        res.send(await customer.save())       
+        res.send(await customer.save())
     } catch (error) {
         return res.status(400).send(error.message)
     }
 })
 
-
-router.put('/:id', async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
     const { error } = validateCustomer(req.body, 'customer')
-    if(error) return res.status(400).send(error.details[0].message)
-    
+    if (error) return res.status(400).send(error.details[0].message)
+
     try {
-        const customer = await Customer.findByIdAndUpdate(req.params.id, {
-            $set: {
-                isPremium: req.body.isPremium,
-                name: req.body.name,
-                phone: req.body.phone
-            }
-        }, { new: true })
+        const customer = await Customer.findByIdAndUpdate(
+            req.params.id,
+            {
+                $set: {
+                    isPremium: req.body.isPremium,
+                    name: req.body.name,
+                    phone: req.body.phone,
+                },
+            },
+            { new: true }
+        )
 
-        res.send(customer)         
-    } catch (error) {        
-        res.status(404).send(error.message) 
+        res.send(customer)
+    } catch (error) {
+        res.status(404).send(error.message)
     }
-})    
+})
 
-
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
     try {
         res.send(await Customer.findByIdAndDelete(req.params.id))
     } catch (error) {
         res.status(404).send(error.message)
     }
-})    
+})
 
 router.get('/:id', async (req, res) => {
-    try {        
-        res.send(await Customer.findById(req.params.id))            
+    try {
+        res.send(await Customer.findById(req.params.id))
     } catch (error) {
-        return res.status(404).send(error.message)        
+        return res.status(404).send(error.message)
     }
-})    
+})
 
 module.exports = router
