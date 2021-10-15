@@ -1,32 +1,42 @@
+const asyncMiddleware = require('../middleware/async')
 const auth = require('../middleware/auth')
 const Customer = require('../models/customer')
 const validateCustomer = require('../models/validation')
 const express = require('express')
 const router = express()
 
-router.get('/', async (req, res) => {
-    res.send(await Customer.find().sort('name'))
-})
-
-router.post('/', auth, async (req, res) => {
-    const customer = new Customer({
-        isPremium: req.body.isPremium,
-        name: req.body.name,
-        phone: req.body.phone,
+router.get(
+    '/',
+    asyncMiddleware(async (req, res) => {
+        res.send(await Customer.find().sort('name'))
     })
+)
 
-    try {
-        res.send(await customer.save())
-    } catch (error) {
-        return res.status(400).send(error.message)
-    }
-})
+router.post(
+    '/',
+    auth,
+    asyncMiddleware(async (req, res) => {
+        let customer = new Customer({
+            isPremium: req.body.isPremium,
+            name: req.body.name,
+            phone: req.body.phone,
+        })
 
-router.put('/:id', auth, async (req, res) => {
-    const { error } = validateCustomer(req.body, 'customer')
-    if (error) return res.status(400).send(error.details[0].message)
+        const { error } = validateCustomer(customer, 'customer')
+        if (error) return res.status(400).send(error.details[0].message)
 
-    try {
+        customer = await customer.save()
+        res.send(customer)
+    })
+)
+
+router.put(
+    '/:id',
+    auth,
+    asyncMiddleware(async (req, res) => {
+        const { error } = validateCustomer(req.body, 'customer')
+        if (error) return res.status(400).send(error.details[0].message)
+
         const customer = await Customer.findByIdAndUpdate(
             req.params.id,
             {
@@ -39,26 +49,28 @@ router.put('/:id', auth, async (req, res) => {
             { new: true }
         )
 
+        if (!customer) return res.status(404).send('Customer Not Found.')
         res.send(customer)
-    } catch (error) {
-        res.status(404).send(error.message)
-    }
-})
+    })
+)
 
-router.delete('/:id', auth, async (req, res) => {
-    try {
-        res.send(await Customer.findByIdAndDelete(req.params.id))
-    } catch (error) {
-        res.status(404).send(error.message)
-    }
-})
+router.delete(
+    '/:id',
+    auth,
+    asyncMiddleware(async (req, res) => {
+        const customer = await Customer.findByIdAndDelete(req.params.id)
+        if (!customer) return res.status(404).send('Customer Not Found.')
+        res.send(customer)
+    })
+)
 
-router.get('/:id', async (req, res) => {
-    try {
-        res.send(await Customer.findById(req.params.id))
-    } catch (error) {
-        return res.status(404).send(error.message)
-    }
-})
+router.get(
+    '/:id',
+    asyncMiddleware(async (req, res) => {
+        const customer = await Customer.findById(req.params.id)
+        if (!customer) return res.status(404).send('Customer Not Found.')
+        res.send(customer)
+    })
+)
 
 module.exports = router

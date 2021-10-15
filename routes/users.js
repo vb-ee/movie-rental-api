@@ -1,3 +1,4 @@
+const asyncMiddleware = require('../middleware/async')
 const auth = require('../middleware/auth')
 const bcrypt = require('bcrypt')
 const _ = require('lodash')
@@ -6,24 +7,29 @@ const validateUser = require('../models/validation')
 const express = require('express')
 const router = express()
 
-router.get('/me', auth, async (req, res) => {
-    res.send(await User.findById(req.user._id).select('-password'))
-})
-
-router.post('/', async (req, res) => {
-    const { error } = validateUser(req.body, 'user')
-    if (error) return res.status(400).send(error.details[0].message)
-
-    let user = await User.findOne({ email: req.body.email })
-    if (user) return res.status(400).send('User already exists!')
-
-    user = new User({
-        name: req.body.name,
-        email: req.body.email,
-        password: req.body.password,
+router.get(
+    '/me',
+    auth,
+    asyncMiddleware(async (req, res) => {
+        res.send(await User.findById(req.user._id).select('-password'))
     })
+)
 
-    try {
+router.post(
+    '/',
+    asyncMiddleware(async (req, res) => {
+        const { error } = validateUser(req.body, 'user')
+        if (error) return res.status(400).send(error.details[0].message)
+
+        let user = await User.findOne({ email: req.body.email })
+        if (user) return res.status(400).send('User already exists!')
+
+        user = new User({
+            name: req.body.name,
+            email: req.body.email,
+            password: req.body.password,
+        })
+
         const salt = await bcrypt.genSalt(10)
         user.password = await bcrypt.hash(user.password, salt)
 
@@ -34,9 +40,7 @@ router.post('/', async (req, res) => {
         res.header('x-auth-token', token).send(
             _.pick(user, ['_id', 'name', 'email'])
         )
-    } catch (error) {
-        return res.status(400).send(error.message)
-    }
-})
+    })
+)
 
 module.exports = router
