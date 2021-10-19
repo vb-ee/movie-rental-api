@@ -14,4 +14,8 @@ Don't forget to install all dependencies
 
 and run it on the terminal with the command
 
-`node app.js`
+`node index.js`
+
+or in the watchmode
+
+`nodemon`
