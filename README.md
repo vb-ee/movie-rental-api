@@ -1,18 +1,15 @@
-# mini-api-project
+# movie-rental-api
 
-This is a mini api project for movie renting app with express and MongoDB
+This project is for movie renting app with express and MongoDB
 
 In order to run it you should have MongoDB installed on your machine
-and run the `mongod` command on the cmd so you can connect to the database
-
-Can be tested with postman or any other api testing software and
-reliable for further improvements like real-life projects
+and run the `mongod` command on your terminal so you can start the database
 
 Don't forget to install all dependencies
 
 `npm install`
 
-and run it on the terminal with the command
+and run it with the command
 
 `node index.js`
 
